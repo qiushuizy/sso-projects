@@ -1,0 +1,7 @@
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    // servlet
+    compile "javax.servlet:servlet-api:$servletVersion"
+    // jwt
+    compile "io.jsonwebtoken:jjwt:0.6.0"
+}

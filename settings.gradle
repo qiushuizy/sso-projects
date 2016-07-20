@@ -1,0 +1,6 @@
+rootProject.name = 'sso-projects'
+include 'sso-server-web'
+include 'sso-client-demo'
+include 'sso-client-api'
+include 'sso-server-api'
+

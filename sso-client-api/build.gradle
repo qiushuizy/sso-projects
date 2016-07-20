@@ -1,0 +1,4 @@
+dependencies {
+    // Servlet
+    compile "javax.servlet:servlet-api:$servletVersion"
+}

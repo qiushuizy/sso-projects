@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 加载属性文件 -->
+    <context:property-placeholder location="classpath:jdbc.properties,classpath*:SSOServerConfig.properties"/>
+
+    <!-- 加载缓存配置 -->
+    <import resource="spring-cache.xml"/>
+    <!-- 加载数据库配置 -->
+    <import resource="spring-database.xml"/>
+
+    <!-- *** SSO认证相关的配置 *************************************************************************************** -->
+    <!-- 一个认证管理器 -->
+    <bean id="cacheBasedAuthorizationManager" class="io.summerx.sso.authentication.CacheBasedAuthorizationManager">
+        <!-- SSO服务器端存放用户身份信息的缓存 -->
+        <property name="ssoCache" ref="ssoCache"/>
+        <!-- 应用端存放用户身份信息的缓存（可以直接通过清除PT对应的缓存来达到退出应用），如果不设置则确保应用端提供了回调服务-->
+        <property name="userCache" ref="userCache"/>
+        <!-- 获取用户信息的服务 -->
+        <property name="userService" ref="ssoUserService"/>
+        <!-- 一个线程池 -->
+        <property name="executorService" ref="scheduledExecutorService"/>
+        <!-- Ticket生成策略 -->
+        <property name="generator">
+            <bean class="io.summerx.sso.authentication.generator.RandomTicketGenerator"/>
+        </property>
+        <!-- TGT凭证过期时间，默认3600秒-->
+        <property name="tgtExpires" value="${sso.timeout.tgt}"/>
+        <!-- ST凭证过期时间，默认60秒 -->
+        <property name="stExpires" value="${sso.timeout.st}"/>
+    </bean>
+
+    <!-- 基于Cache的SSO过滤器 -->
+    <bean id="ssoCacheFilter" class="io.summerx.sso.web.filter.SSOServerFilter">
+        <!-- 定义认证器 -->
+        <property name="authManager" ref="cacheBasedAuthorizationManager"/>
+        <!-- exclude=true表示除了配置的url-pattern其他都要过滤，exclude=false表示只过滤配置的url-pattern，默认false -->
+        <property name="exclude" value="true"/>
+        <!-- 需要过滤的Url Pattern -->
+        <property name="patterns" value="/sso-*"/>
+    </bean>
+
+    <!-- 告诉AuthorizationManager怎么获取用户信息 -->
+    <bean id="ssoUserService" class="io.summerx.sso.service.impl.SSOUserServiceImpl">
+        <property name="jdbcExecutor" ref="jdbcExecutor"/>
+    </bean>
+
+    <!-- *** 其他配置 *********************************************************************************************** -->
+    <!-- 一个线程池 -->
+    <bean id="scheduledExecutorService" class="org.springframework.scheduling.concurrent.ScheduledExecutorFactoryBean">
+        <property name="poolSize" value="10" />
+    </bean>
+</beans>
