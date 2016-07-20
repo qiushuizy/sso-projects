@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -94,12 +95,15 @@ public class SSOController {
             ModelAndView mv = new ModelAndView("auth/sso-login");
             // 保持username
             mv.addObject("username", username);
+            // 认证出错异常
+            mv.addObject("ex", ex);
             // FIXME 5. 验证失败，保存错误消息，返回登录页面
             mv.addObject("errtx", ex.getMessage());
             // 保持retUrl
             mv.addObject("retUrl", retUrl);
-            return mv;
 
+            RequestContextUtils.findWebApplicationContext(request).getMessage("xxx", null, RequestContextUtils.getLocale(request));
+            return mv;
         }
     }
 
@@ -192,11 +196,6 @@ public class SSOController {
         }
 
         return new ModelAndView("auth/sso-login");
-    }
-
-    @RequestMapping(value = "/welcome", method = {RequestMethod.GET, RequestMethod.POST})
-    public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response) {
-        return new ModelAndView("auth/welcome");
     }
 
     /**

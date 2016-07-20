@@ -25,11 +25,6 @@
 		<property name="cookieName" value="__L"/>
 		<property name="defaultLocale" value="zh"/>
 	</bean>
-    <!-- TODO 资源文件 (使用infoccsp-framework的MessageUtils) -->
-    <!-- TODO 注意当使用infoccsp-framework时，只有MessageUtils持有MessageSource，故只能通过MessageUtils获取Message -->
-    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-        <property name="basename" value="i18n.message"></property>
-    </bean>
 
 	<!-- 统一的异常处理 -->
 	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">

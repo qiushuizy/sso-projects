@@ -1,5 +1,6 @@
 package io.summerx.sso.web.filter;
 
+import io.summerx.framework.sso.user.SSOUserHolder;
 import io.summerx.framework.utils.StringUtils;
 import io.summerx.framework.web.filter.AbstractUrlFilter;
 import io.summerx.framework.web.utils.CookieUtils;
@@ -38,9 +39,10 @@ public class SSOServerFilter extends AbstractUrlFilter {
             return;
         }
 
+        UserAuthorization authorization;
         try {
             // 验证Tgt
-            UserAuthorization authorization = authManager.authenticate(new TgtCredentials(tgt, new WebClientInfo(request)));
+            authorization = authManager.authenticate(new TgtCredentials(tgt, new WebClientInfo(request)));
             if (authorization == null) {
                 notLogin(request, response, filterChain);
                 return;
@@ -51,10 +53,11 @@ public class SSOServerFilter extends AbstractUrlFilter {
         }
 
         try {
+            SSOUserHolder.set(authorization);
             // 能走到这里说明已经登录
             filterChain.doFilter(request, response);
         } finally {
-
+            SSOUserHolder.remove();
         }
     }
 

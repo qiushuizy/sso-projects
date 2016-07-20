@@ -3,13 +3,24 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <!-- 加载属性文件 -->
-    <context:property-placeholder location="classpath:jdbc.properties,classpath*:SSOServerConfig.properties"/>
-
     <!-- 加载缓存配置 -->
     <import resource="spring-cache.xml"/>
     <!-- 加载数据库配置 -->
     <import resource="spring-database.xml"/>
+
+    <!-- 加载属性文件 -->
+    <context:property-placeholder location="classpath:jdbc.properties,classpath*:SSOServerConfig.properties"/>
+
+    <!-- 向ApplicationContext注入MessageSource -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames">
+            <array>
+                <value>i18n.message</value>
+                <value>i18n.forms</value>
+                <value>i18n.message-authenticate</value>
+            </array>
+        </property>
+    </bean>
 
     <!-- *** SSO认证相关的配置 *************************************************************************************** -->
     <!-- 一个认证管理器 -->
@@ -32,19 +43,19 @@
         <property name="stExpires" value="${sso.timeout.st}"/>
     </bean>
 
-    <!-- 基于Cache的SSO过滤器 -->
-    <bean id="ssoCacheFilter" class="io.summerx.sso.web.filter.SSOServerFilter">
+    <!-- 告诉AuthorizationManager怎么获取用户信息 -->
+    <bean id="ssoUserService" class="io.summerx.sso.service.impl.SSOUserServiceImpl">
+        <property name="jdbcExecutor" ref="jdbcExecutor"/>
+    </bean>
+
+    <!-- SSO过滤器 -->
+    <bean id="ssoServerFilter" class="io.summerx.sso.web.filter.SSOServerFilter">
         <!-- 定义认证器 -->
         <property name="authManager" ref="cacheBasedAuthorizationManager"/>
         <!-- exclude=true表示除了配置的url-pattern其他都要过滤，exclude=false表示只过滤配置的url-pattern，默认false -->
         <property name="exclude" value="true"/>
         <!-- 需要过滤的Url Pattern -->
         <property name="patterns" value="/sso-*"/>
-    </bean>
-
-    <!-- 告诉AuthorizationManager怎么获取用户信息 -->
-    <bean id="ssoUserService" class="io.summerx.sso.service.impl.SSOUserServiceImpl">
-        <property name="jdbcExecutor" ref="jdbcExecutor"/>
     </bean>
 
     <!-- *** 其他配置 *********************************************************************************************** -->

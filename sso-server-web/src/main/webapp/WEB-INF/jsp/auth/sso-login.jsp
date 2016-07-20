@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -9,7 +10,7 @@
     <meta name="description" content="跨境电商综合服务平台"/>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
     <link rel="BookMark" href="/favicon.ico" type="image/x-icon"/>
-    <title>跨境电商综合服务平台</title>
+    <title><spring:message code="title.sso.login"/></title>
 </head>
 <style>
     body {
@@ -43,10 +44,15 @@
         <div class="login-form">
             <h3 class="login-form-title">用户登录</h3>
             <form action="/sso/sso-login" method="post">
-                <span style="color:red;">${errtx}</span><br/>
+                <span style="color:red;">
+                    ${errtx}
+                </span>
+                <br/>
                 <input type="hidden" name="retUrl" value="${retUrl}">
-                Username: <input type="text" name="username" value="${username}"><br/>
-                Password: <input type="password" name="password" value=""><br>
+                <spring:message code="form.sso.login.username"/>: <input type="text" name="username" value="${username}">
+                <br/>
+                Password: <input type="password" name="password" value="">
+                <br>
                 <input type="submit" value="Login">
             </form>
         </div>

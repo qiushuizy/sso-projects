@@ -5,4 +5,8 @@
     <import resource="spring-cache.xml"/>
     <import resource="spring-filter.xml"/>
 
+    <!-- 向ApplicationContext注入MessageSource -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basename" value="i18n.message"></property>
+    </bean>
 </beans>
