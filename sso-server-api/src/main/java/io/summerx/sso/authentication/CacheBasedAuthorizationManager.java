@@ -83,6 +83,8 @@ public class CacheBasedAuthorizationManager extends AbstractAuthorizationManager
      * @param action
      */
     protected void notifyApplication(GrantedApplication application, String action) {
+        super.notifyApplication(application, action);
+        // 清除应用端的用户缓存
         if (userCache != null && application.getTikcet() != null) {
             userCache.evict(application.getTikcet());
         }

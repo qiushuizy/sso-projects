@@ -1,6 +1,7 @@
 package io.summerx.sso.authentication;
 
 import io.summerx.framework.codec.TextEncodeHelper;
+import io.summerx.framework.utils.RandomUtils;
 import io.summerx.framework.utils.StringUtils;
 import io.summerx.sso.authentication.exception.*;
 import io.summerx.sso.authentication.generator.RandomTicketGenerator;
@@ -10,6 +11,9 @@ import io.summerx.sso.authentication.userdetails.UserDetails;
 import io.summerx.sso.constants.SSOServerContants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.ExecutorService;
 
@@ -212,7 +216,25 @@ public abstract class AbstractAuthorizationManager implements AuthorizationManag
      * @param application
      * @param action
      */
-    protected abstract void notifyApplication(GrantedApplication application, String action);
+    protected void notifyApplication(GrantedApplication application, String action) {
+        if (application == null || application.getUrl() == null) {
+            logger.warn("application/url is null.");
+            return;
+        }
+
+        // 回调应用提供的服务
+        RestTemplate rt = new RestTemplate();
+        MultiValueMap<String, String> requestEntity = new LinkedMultiValueMap<>();
+        // 应用名
+        requestEntity.add("app", application.getName());
+        // PT凭证
+        requestEntity.add("ticket", application.getTikcet());
+        // 动作类型
+        requestEntity.add("action", action);
+        // 调用
+        rt.postForObject(application.getUrl(), requestEntity, String.class);
+
+    }
 
     /**
      * 加密策略，你可以重置此方法以保持加密策略与注册时一致

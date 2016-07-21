@@ -6,6 +6,9 @@
     <title>Internal Server Error</title>
 </head>
 <body>
-${exception}
+<div style="margin: auto">
+    <span style="font-size: x-large; font-weight: bold;vertical-align: middle">出错啦！</span>
+    <div style="display: none">${exception}</div>
+</div>
 </body>
 </html>
